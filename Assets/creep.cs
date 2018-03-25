@@ -10,6 +10,7 @@ public class creep : MonoBehaviour {
     public cell[,] m_gridarr;
     public pathfinding m_pathfinder;
     public Vector2 m_initcellPos;
+    public State m_currentState;
 
 
     //this is hackish "state machine" variable
@@ -30,13 +31,21 @@ public class creep : MonoBehaviour {
          m_pathfinder = new pathfinding(m_gridarr);
          cell target = m_gridarr[5, 9];
          PathFind(target);
+        
     }
 	// Use this for initialization
 	void Start () {
-
-
+        m_currentState = new Idle(this);
 	}
 
+    public void SetState(State state)
+    {
+        if (m_currentState != null)
+            m_currentState.OnStateExit();
+        m_currentState = state;
+        if (m_currentState != null)
+            m_currentState.OnStateEnter();
+    }
     void PathFind(cell target)
     {
         m_path = m_pathfinder.FindPath(m_gridarr[(int)m_initcellPos.x, (int)m_initcellPos.y], target);
@@ -44,8 +53,9 @@ public class creep : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        if (m_state == "idle")
+        if(m_currentState != null)
+        m_currentState.OnStateUpdate();
+        /*if (m_state == "idle")
         {
             if (m_path.Count > 0)
                 m_state = "settarget";
@@ -72,7 +82,7 @@ public class creep : MonoBehaviour {
             {
                 m_state = "idle";
             }
-        }
+        }*/
         
         
 	}
